@@ -23,7 +23,7 @@ Policy development mở quyền anon chỉ dùng với dữ liệu thử nghiệ
 
 ## Branding / PWA
 
-Logo SVG công ty nguyên bản nằm ở `public/homie-logo.svg`; header dùng chung ở `components/layout/app-header.tsx`. CSS căn vùng artwork và bỏ khoảng trắng thừa của canvas, không sửa SVG hay crop artwork. Màu nhấn và font ở đầu `app/globals.css`. Giao diện sáng, glass nhẹ ở thanh tab và backdrop. Có metadata iPhone và manifest; cần logo thật để bổ sung app icon/apple-touch-icon. Chưa có service worker/offline PWA. Xuất Excel hoạt động hoàn toàn trên trình duyệt, không cần API backend.
+Logo SVG công ty nguyên bản nằm ở `public/homie-logo.svg`; header dùng chung ở `components/layout/app-header.tsx`. CSS căn vùng artwork và bỏ khoảng trắng thừa của canvas, không sửa SVG hay crop artwork. Màu nhấn và font ở đầu `app/globals.css`. Giao diện sáng, glass nhẹ ở thanh tab và backdrop. Có metadata iPhone và manifest; đã có icon/logo mark đỏ và apple-touch-icon cho Home Screen. Chưa có service worker/offline PWA. Xuất Excel hoạt động hoàn toàn trên trình duyệt, không cần API backend.
 
 ## Ngày nghiệp vụ và Excel
 
@@ -38,3 +38,9 @@ Quản lý nhân viên có filter Đang hoạt động / Đã ngừng / Tất c�
 Giao diện giữ bố cục đỏ/trắng, token chung tại `app/globals.css`, safe area trên/dưới, tab bar 72px cộng safe area, bottom sheet theo visual viewport để giảm chồng bàn phím, segmented loại nghỉ, skeleton và empty state nhẹ. Không có dark mode hay logo công ty tự tạo.
 
 Kiểm tra: `npm run typecheck`, `npm run lint`, `npm test`, `npm run build`.
+
+## App icons
+
+Tên Home Screen: **Homie Attendance**. Metadata icon và Apple web app cấu hình tại `app/layout.tsx`, manifest tại `public/manifest.webmanifest`. Các asset: `homie-icon.svg`, `icon-192.png`, `icon-512.png`, `apple-touch-icon.png` (180px), `favicon.ico` (16/32/48px). Icon lấy nguyên path `st1` (logo mark đỏ, gồm các hạt bay) và gradient gốc từ `homie-logo.svg`, đặt giữa canvas trắng vuông có khoảng thở. Không thêm chữ/slogan, không vẽ lại mark, không bo góc trong asset. Logo ngang ở header giữ nguyên.
+
+Đã bỏ route favicon trống để `/favicon.ico` phục vụ asset thật. Trên Safari iPhone dùng Chia sẻ → Thêm vào Màn hình chính; nếu đã cài app trước khi đổi icon, xóa shortcut cũ rồi thêm lại để tránh icon cache. Chưa có service worker/offline; chế độ standalone và Apple Home Screen không thay đổi nguồn dữ liệu Supabase.
