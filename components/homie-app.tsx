@@ -23,6 +23,7 @@ import {
 import type { Absence, Employee, MonthlySettings } from "@/types";
 import {
   employeeTotals,
+  calculateAccruedWorkdaysToDate,
   monthLabel,
   number,
   shiftMonth,
@@ -89,10 +90,26 @@ export function HomieApp() {
   };
   const active = data.employees.filter((e) => e.active);
   const records = data.absences.filter((a) => a.date.startsWith(month));
-  const totals = active.map((e) =>
-    employeeTotals(e.id, data.absences, settings),
-  );
   const today = getVietnamToday();
+  const todayAbsences = active
+    .map((employee) =>
+      data.absences.find(
+        (absence) =>
+          absence.employeeId === employee.id && absence.date === today,
+      ),
+    )
+    .filter((absence) => absence !== undefined);
+  const offToday = todayAbsences.length;
+  const workingToday = active.length - offToday;
+  const paidToday = todayAbsences.filter(
+    (absence) => absence.type === "paid_leave",
+  ).length;
+  const unpaidToday = todayAbsences.filter(
+    (absence) => absence.type === "unpaid_leave",
+  ).length;
+  const totals = active.map((employee) =>
+    employeeTotals(employee.id, data.absences, settings),
+  );
   const isOff = (id: string) =>
     data.absences.some((a) => a.employeeId === id && a.date === today);
   const filteredEmployees = data.employees.filter(
@@ -249,19 +266,32 @@ export function HomieApp() {
         </div>
         {tab === "home" && (
           <>
-            <div className="hero card">
-              <div>
-                <span>Ngày công thực tế</span>
-                <strong>
-                  {number(totals.reduce((s, t) => s + t.actual, 0))}
-                  <small> công</small>
-                </strong>
-                <p>Tổng công của {active.length} nhân viên trong tháng</p>
+            <section
+              className="hero card today-summary"
+              aria-label="Tình hình hôm nay"
+            >
+              <div className="today-summary-heading">
+                <h2>Tình hình hôm nay</h2>
+                <time dateTime={today}>{formatVietnamDate(today)}</time>
               </div>
-              <span className="hero-icon">
-                <CalendarDays size={30} />
-              </span>
-            </div>
+              <div className="today-summary-metrics">
+                <div>
+                  <strong>{workingToday}</strong>
+                  <span>Đang đi làm</span>
+                </div>
+                <div>
+                  <strong>{offToday}</strong>
+                  <span>Nghỉ hôm nay</span>
+                </div>
+              </div>
+              <p>
+                {offToday > 0
+                  ? `${paidToday} nghỉ phép · ${unpaidToday} nghỉ không phép`
+                  : active.length === 0
+                    ? "Chưa có nhân viên đang hoạt động"
+                    : "Tất cả nhân viên đang đi làm"}
+              </p>
+            </section>
             <div className="summary-grid">
               <div className="card metric">
                 <span>Nhân viên</span>
@@ -320,7 +350,7 @@ export function HomieApp() {
                     key={e.id}
                     employee={e}
                     subtitle={isOff(e.id) ? "● Nghỉ hôm nay" : "Đi làm"}
-                    value={`${number(employeeTotals(e.id, data.absences, settings).actual)} công`}
+                    value={`${number(calculateAccruedWorkdaysToDate(e.id, data.absences, settings, today))} công`}
                     onClick={() => {
                       window.scrollTo(0, 0);
                       setDetail(e.id);
@@ -411,7 +441,7 @@ export function HomieApp() {
                   <Pencil size={16} /> Sửa thông tin
                 </button>
               </div>
-              <div className="summary-grid two">
+              <div className="summary-grid">
                 <div className="card metric">
                   <span>Công chuẩn</span>
                   <strong>{number(settings.standardWorkdays)}</strong>
@@ -551,12 +581,6 @@ export function HomieApp() {
               <div className="card metric">
                 <span>Nhân viên</span>
                 <strong>{active.length}</strong>
-              </div>
-              <div className="card metric">
-                <span>Tổng ngày công</span>
-                <strong>
-                  {number(totals.reduce((s, t) => s + t.actual, 0))}
-                </strong>
               </div>
               <div className="card metric">
                 <span>Nghỉ phép</span>

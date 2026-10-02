@@ -1,4 +1,9 @@
-import { dateWeekday, datesInMonth } from "@/lib/date";
+import {
+  dateWeekday,
+  datesInMonth,
+  getVietnamToday,
+  parseDateOnly,
+} from "@/lib/date";
 import type { Absence, MonthlySettings } from "@/types";
 export const number = (n: number) =>
   new Intl.NumberFormat("vi-VN", { maximumFractionDigits: 2 }).format(n);
@@ -38,4 +43,28 @@ export function employeeTotals(
     deducted,
     actual: Math.max(0, settings.standardWorkdays - deducted),
   };
+}
+
+/** Reuse monthly leave deductions, limited to elapsed Vietnam business dates. */
+export function calculateAccruedWorkdaysToDate(
+  employeeId: string,
+  absences: Absence[],
+  settings: MonthlySettings,
+  today = getVietnamToday(),
+): number {
+  parseDateOnly(today);
+  const dates = datesInMonth(settings.month);
+  const currentMonth = today.slice(0, 7);
+  if (settings.month > currentMonth) return 0;
+  if (settings.month < currentMonth) {
+    return employeeTotals(employeeId, absences, settings).actual;
+  }
+  const elapsedWorkdays = dates
+    .filter((date) => date <= today)
+    .reduce((sum, date) => sum + dayWeight(date), 0);
+  return employeeTotals(
+    employeeId,
+    absences.filter((absence) => absence.date <= today),
+    { ...settings, standardWorkdays: elapsedWorkdays },
+  ).actual;
 }

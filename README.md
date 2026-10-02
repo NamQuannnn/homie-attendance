@@ -13,7 +13,7 @@ Mở http://localhost:3000. Kiểm tra: `npm run lint`, `npm test`, `npm run bui
 
 ## Quy tắc
 
-Không báo nghỉ = đi làm. Thứ Hai–Sáu 1 công, Thứ Bảy 0,5, Chủ Nhật 0. Công chuẩn theo lịch có thể override. Nghỉ phép được bù tối đa số công phép tháng (mặc định 1); nghỉ không phép luôn trừ theo trọng số ngày. Phép không cộng dồn qua tháng. Số ngày nghỉ là số record; công bị trừ theo lịch. Công hiển thị là tổng dự kiến cả tháng, bao gồm ngày tương lai. Nhân viên inactive giữ lịch sử và xem được chi tiết nhưng không có trong tổng quan/báo cáo. Chưa hỗ trợ ngày bắt đầu/ngừng hoạt động giữa tháng.
+Không báo nghỉ = đi làm. Thứ Hai–Sáu 1 công, Thứ Bảy 0,5, Chủ Nhật 0. Công chuẩn theo lịch có thể override. Nghỉ phép được bù tối đa số công phép tháng (mặc định 1); nghỉ không phép luôn trừ theo trọng số ngày. Phép không cộng dồn qua tháng. Số ngày nghỉ là số record; công bị trừ theo lịch. Tổng quan hiển thị công tích lũy đến hôm nay theo giờ Việt Nam, không tính ngày/nghỉ tương lai; tháng quá khứ dùng công thực tế cả tháng, tháng tương lai bằng 0. Báo cáo và Excel giữ tổng dự kiến cả tháng. Nhân viên inactive giữ lịch sử và xem được chi tiết nhưng không có trong tổng quan/báo cáo. Chưa hỗ trợ ngày bắt đầu/ngừng hoạt động giữa tháng.
 
 ## Dữ liệu và backend
 

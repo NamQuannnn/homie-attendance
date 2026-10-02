@@ -977,3 +977,38 @@ fieldset {
   color: var(--muted);
   line-height: 1.5;
 }
+
+.today-summary {
+  display: block;
+}
+.today-summary-heading {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+.today-summary-heading h2 {
+  font-size: 16px;
+  font-weight: 600;
+}
+.today-summary-heading time {
+  font-size: 16px;
+  white-space: nowrap;
+}
+.today-summary-metrics {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 20px;
+  margin: 12px 0 16px;
+}
+.today-summary-metrics > div + div {
+  border-left: 1px solid #ffffff40;
+  padding-left: 20px;
+}
+.today-summary-metrics strong {
+  margin: 0 0 4px;
+}
+.today-summary-metrics span {
+  font-size: 14px;
+}
