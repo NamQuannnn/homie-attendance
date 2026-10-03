@@ -1,7 +1,7 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { buildAttendanceWorkbook, attendanceFilename } from "./excel";
-import { employeeTotals } from "@/lib/attendance/calculations";
+import { employeeTotalsToDate } from "@/lib/attendance/calculations";
 import type { AppData } from "@/types";
 const data: AppData = {
   employees: [
@@ -41,7 +41,7 @@ const settings = {
   paidLeaveAllowance: 1,
 };
 test("export shares attendance calculations, excludes inactive and other months, sorts dates", () => {
-  const workbook = buildAttendanceWorkbook(data, settings);
+  const workbook = buildAttendanceWorkbook(data, settings, "2026-10-03");
   assert.equal(workbook.length, 2);
   assert.equal(workbook[0].sheet, "Bao cao thang");
   assert.equal(workbook[1].sheet, "Chi tiet nghi");
@@ -50,7 +50,7 @@ test("export shares attendance calculations, excludes inactive and other months,
   const row = workbook[0].data[1];
   assert.equal(
     (row[3] as { value: number }).value,
-    employeeTotals("a", data.absences, settings).actual,
+    employeeTotalsToDate("a", data.absences, settings, "2026-10-03").actual,
   );
   assert.equal((row[4] as { value: number }).value, 3);
   assert.deepEqual(
@@ -77,4 +77,39 @@ test("empty workbook retains both sheet headers and month validation", () => {
   assert.equal(workbook[0].data.length, 1);
   assert.equal(workbook[1].data.length, 1);
   assert.throws(() => attendanceFilename("2026-13"));
+});
+
+test("report/export actual totals agree across current, past and future months", () => {
+  const snapshot: AppData = {
+    ...data,
+    employees: [...data.employees, { id: "c", name: "Nguyễn C", active: true }],
+    absences: [
+      ...data.absences,
+      { id: "6", employeeId: "c", date: "2026-10-02", type: "unpaid_leave" },
+    ],
+  };
+  for (const [today, expected] of [
+    ["2026-10-03", 4],
+    ["2026-11-01", 47.5],
+    ["2026-09-30", 0],
+  ] as const) {
+    const workbook = buildAttendanceWorkbook(snapshot, settings, today);
+    const actual = workbook[0].data
+      .slice(1)
+      .reduce((sum, row) => sum + (row[3] as { value: number }).value, 0);
+    const report = snapshot.employees
+      .filter((employee) => employee.active)
+      .reduce(
+        (sum, employee) =>
+          sum +
+          employeeTotalsToDate(employee.id, snapshot.absences, settings, today)
+            .actual,
+        0,
+      );
+    assert.equal(actual, report);
+    assert.equal(report, expected);
+    for (const row of workbook[0].data.slice(1)) {
+      assert.equal((row[2] as { value: number }).value, 24.5);
+    }
+  }
 });

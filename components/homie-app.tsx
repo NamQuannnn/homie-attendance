@@ -22,7 +22,7 @@ import {
 } from "@/lib/date";
 import type { Absence, Employee, MonthlySettings } from "@/types";
 import {
-  employeeTotals,
+  employeeTotalsToDate,
   calculateAccruedWorkdaysToDate,
   monthLabel,
   number,
@@ -108,7 +108,7 @@ export function HomieApp() {
     (absence) => absence.type === "unpaid_leave",
   ).length;
   const totals = active.map((employee) =>
-    employeeTotals(employee.id, data.absences, settings),
+    employeeTotalsToDate(employee.id, data.absences, settings, today),
   );
   const isOff = (id: string) =>
     data.absences.some((a) => a.employeeId === id && a.date === today);
@@ -120,7 +120,7 @@ export function HomieApp() {
   );
   const person = data.employees.find((e) => e.id === detail);
   const personTotals = person
-    ? employeeTotals(person.id, data.absences, settings)
+    ? employeeTotalsToDate(person.id, data.absences, settings, today)
     : null;
   function changeMonth(offset: number) {
     const next = shiftMonth(month, offset);
@@ -210,6 +210,16 @@ export function HomieApp() {
     <div className="app">
       <AppHeader
         title={tabs.find((t) => t.id === tab)?.label ?? "Tổng quan"}
+        titleAction={
+          tab === "attendance" ? (
+            <button
+              className="button primary compact"
+              onClick={() => setModal({ kind: "absence" })}
+            >
+              <Plus size={17} /> Thêm người nghỉ
+            </button>
+          ) : undefined
+        }
         action={
           <button
             aria-label="Cài đặt tháng"
@@ -398,12 +408,6 @@ export function HomieApp() {
                   viên nghỉ
                 </p>
               </div>
-              <button
-                className="button primary compact"
-                onClick={() => setModal({ kind: "absence" })}
-              >
-                <Plus size={17} /> Thêm người nghỉ
-              </button>
             </div>
             {absenceRows(data.absences.filter((a) => a.date === selected))}
             <div className="info">
@@ -443,11 +447,11 @@ export function HomieApp() {
               </div>
               <div className="summary-grid">
                 <div className="card metric">
-                  <span>Công chuẩn</span>
+                  <span>Công chuẩn tháng</span>
                   <strong>{number(settings.standardWorkdays)}</strong>
                 </div>
                 <div className="card metric">
-                  <span>Công thực tế</span>
+                  <span>Công hiện tại</span>
                   <strong>{number(personTotals.actual)}</strong>
                 </div>
                 <div className="card metric">
@@ -546,7 +550,12 @@ export function HomieApp() {
               </div>
               <div className="card">
                 {filteredEmployees.map((e) => {
-                  const t = employeeTotals(e.id, data.absences, settings);
+                  const t = employeeTotalsToDate(
+                    e.id,
+                    data.absences,
+                    settings,
+                    today,
+                  );
                   return (
                     <EmployeeRow
                       key={e.id}
@@ -583,6 +592,12 @@ export function HomieApp() {
                 <strong>{active.length}</strong>
               </div>
               <div className="card metric">
+                <span>Tổng ngày công</span>
+                <strong>
+                  {number(totals.reduce((sum, total) => sum + total.actual, 0))}
+                </strong>
+              </div>
+              <div className="card metric">
                 <span>Nghỉ phép</span>
                 <strong>{totals.reduce((s, t) => s + t.paid, 0)}</strong>
               </div>
@@ -596,6 +611,7 @@ export function HomieApp() {
               <ExportButton
                 data={data}
                 settings={settings}
+                today={today}
                 disabled={saving || loading}
                 onMessage={setMessage}
               />
@@ -619,6 +635,7 @@ export function HomieApp() {
                   employee={e}
                   absences={data.absences}
                   settings={settings}
+                  today={today}
                 />
               ))}
             </div>

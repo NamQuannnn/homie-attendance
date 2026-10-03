@@ -1,15 +1,17 @@
 import type { Employee, Absence, MonthlySettings } from "@/types";
-import { employeeTotals, number } from "@/lib/attendance/calculations";
+import { employeeTotalsToDate, number } from "@/lib/attendance/calculations";
 export function ReportCard({
   employee,
   absences,
   settings,
+  today,
 }: {
   employee: Employee;
   absences: Absence[];
   settings: MonthlySettings;
+  today: string;
 }) {
-  const t = employeeTotals(employee.id, absences, settings);
+  const t = employeeTotalsToDate(employee.id, absences, settings, today);
   return (
     <div className="card report-card">
       <div className="report-top">

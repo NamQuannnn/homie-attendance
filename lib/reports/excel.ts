@@ -1,7 +1,12 @@
 import type { Cell, Sheet } from "write-excel-file/browser";
 import type { AppData, MonthlySettings } from "@/types";
-import { dayWeight, employeeTotals } from "@/lib/attendance/calculations";
-import { formatVietnamDate, parseDateOnly, parseMonthKey } from "@/lib/date";
+import { dayWeight, employeeTotalsToDate } from "@/lib/attendance/calculations";
+import {
+  formatVietnamDate,
+  getVietnamToday,
+  parseDateOnly,
+  parseMonthKey,
+} from "@/lib/date";
 const text = (value: string): Cell => ({
   value,
   type: String,
@@ -27,11 +32,17 @@ const header = (labels: string[]) =>
 export function buildAttendanceWorkbook(
   data: AppData,
   settings: MonthlySettings,
+  today = getVietnamToday(),
 ): Sheet<Blob>[] {
   parseMonthKey(settings.month);
   const employees = data.employees.filter((e) => e.active);
   const rows = employees.map((employee, index) => {
-    const total = employeeTotals(employee.id, data.absences, settings);
+    const total = employeeTotalsToDate(
+      employee.id,
+      data.absences,
+      settings,
+      today,
+    );
     const notes = total.records
       .filter((a) => a.note)
       .map((a) => `${formatVietnamDate(a.date, false)}: ${a.note}`)

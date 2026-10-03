@@ -1012,3 +1012,16 @@ fieldset {
 .today-summary-metrics span {
   font-size: 14px;
 }
+
+.app-header-title {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+.app-header-title.has-action h1 {
+  font-size: clamp(24px, 6.7vw, 30px);
+}
+.app-header-title > button {
+  flex-shrink: 0;
+}

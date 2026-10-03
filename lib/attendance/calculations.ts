@@ -68,3 +68,21 @@ export function calculateAccruedWorkdaysToDate(
     { ...settings, standardWorkdays: elapsedWorkdays },
   ).actual;
 }
+
+/** Shared displayed/exported totals: monthly absence counts, actual work accrued to date. */
+export function employeeTotalsToDate(
+  employeeId: string,
+  absences: Absence[],
+  settings: MonthlySettings,
+  today = getVietnamToday(),
+) {
+  return {
+    ...employeeTotals(employeeId, absences, settings),
+    actual: calculateAccruedWorkdaysToDate(
+      employeeId,
+      absences,
+      settings,
+      today,
+    ),
+  };
+}

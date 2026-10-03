@@ -3,9 +3,11 @@ import type { ReactNode } from "react";
 export function AppHeader({
   title,
   action,
+  titleAction,
 }: {
   title: string;
   action?: ReactNode;
+  titleAction?: ReactNode;
 }) {
   return (
     <header className="app-header">
@@ -24,7 +26,10 @@ export function AppHeader({
         {action && <div className="app-header-action">{action}</div>}
       </div>
       <p className="app-header-subtitle">CHẤM CÔNG NỘI BỘ</p>
-      <h1>{title}</h1>
+      <div className={`app-header-title${titleAction ? " has-action" : ""}`}>
+        <h1>{title}</h1>
+        {titleAction}
+      </div>
     </header>
   );
 }

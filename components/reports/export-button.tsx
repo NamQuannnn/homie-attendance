@@ -9,11 +9,13 @@ import {
 export function ExportButton({
   data,
   settings,
+  today,
   disabled,
   onMessage,
 }: {
   data: AppData;
   settings: MonthlySettings;
+  today: string;
   disabled: boolean;
   onMessage: (message: string) => void;
 }) {
@@ -27,7 +29,7 @@ export function ExportButton({
       const { default: writeExcelFile } =
         await import("write-excel-file/browser");
       const blob = await writeExcelFile(
-        buildAttendanceWorkbook(data, settings),
+        buildAttendanceWorkbook(data, settings, today),
         { fontFamily: "Calibri", fontSize: 11 },
       ).toBlob();
       const url = URL.createObjectURL(blob);

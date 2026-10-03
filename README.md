@@ -13,7 +13,7 @@ Mở http://localhost:3000. Kiểm tra: `npm run lint`, `npm test`, `npm run bui
 
 ## Quy tắc
 
-Không báo nghỉ = đi làm. Thứ Hai–Sáu 1 công, Thứ Bảy 0,5, Chủ Nhật 0. Công chuẩn theo lịch có thể override. Nghỉ phép được bù tối đa số công phép tháng (mặc định 1); nghỉ không phép luôn trừ theo trọng số ngày. Phép không cộng dồn qua tháng. Số ngày nghỉ là số record; công bị trừ theo lịch. Tổng quan hiển thị công tích lũy đến hôm nay theo giờ Việt Nam, không tính ngày/nghỉ tương lai; tháng quá khứ dùng công thực tế cả tháng, tháng tương lai bằng 0. Báo cáo và Excel giữ tổng dự kiến cả tháng. Nhân viên inactive giữ lịch sử và xem được chi tiết nhưng không có trong tổng quan/báo cáo. Chưa hỗ trợ ngày bắt đầu/ngừng hoạt động giữa tháng.
+Không báo nghỉ = đi làm. Thứ Hai–Sáu 1 công, Thứ Bảy 0,5, Chủ Nhật 0. Công chuẩn theo lịch có thể override. Nghỉ phép được bù tối đa số công phép tháng (mặc định 1); nghỉ không phép luôn trừ theo trọng số ngày. Phép không cộng dồn qua tháng. Số ngày nghỉ là số record; công bị trừ theo lịch. Tổng quan hiển thị công tích lũy đến hôm nay theo giờ Việt Nam, không tính ngày/nghỉ tương lai; tháng quá khứ dùng công thực tế cả tháng, tháng tương lai bằng 0. Nhân viên, chi tiết, Báo cáo và Excel dùng cùng công tích lũy; công chuẩn vẫn tính cả tháng. Nhân viên inactive giữ lịch sử và xem được chi tiết nhưng không có trong tổng quan/báo cáo. Chưa hỗ trợ ngày bắt đầu/ngừng hoạt động giữa tháng.
 
 ## Dữ liệu và backend
 
@@ -29,7 +29,7 @@ Logo SVG công ty nguyên bản nằm ở `public/homie-logo.svg`; header dùng 
 
 Ngày hiện tại và tháng mặc định luôn theo `Asia/Ho_Chi_Minh`, kể cả server hoặc thiết bị ở múi giờ khác. `lib/date/index.ts` gom helper lấy ngày/tháng Việt Nam, parse date-only an toàn, ngày trong tuần, lịch tháng và format `DD/MM/YYYY`. Các ngày nghỉ vẫn là `YYYY-MM-DD`; tính lịch bằng UTC để giữ nguyên ngày đã chọn. Seed SQL cũng dùng giờ Việt Nam. Không thay schema hay quy tắc công.
 
-Nút Xuất Excel dùng `write-excel-file` (lazy-load khi bấm) tạo `Homie_Attendance_YYYY-MM.xlsx`, hai sheet `Bao cao thang` và `Chi tiet nghi`, cùng snapshot đang hiển thị và cùng hàm `employeeTotals`/`dayWeight`. Cả hai sheet chỉ gồm nhân viên active và ngày nghỉ trong tháng. Header bold, freeze hàng đầu, chiều rộng cột giới hạn hợp lý, công dạng số, ngày là Excel date serial. Ghi chú của người dùng là text, không chạy thành công thức Excel.
+Nút Xuất Excel dùng `write-excel-file` (lazy-load khi bấm) tạo `Homie_Attendance_YYYY-MM.xlsx`, hai sheet `Bao cao thang` và `Chi tiet nghi`, cùng snapshot đang hiển thị và cùng hàm `employeeTotalsToDate`/`dayWeight`. Cả hai sheet chỉ gồm nhân viên active và ngày nghỉ trong tháng. Header bold, freeze hàng đầu, chiều rộng cột giới hạn hợp lý, công dạng số, ngày là Excel date serial. Ghi chú của người dùng là text, không chạy thành công thức Excel.
 
 Download dùng Blob URL và link download, giải phóng URL sau 60 giây để Safari đủ thời gian đọc file. Đã kiểm tra tải trên Chrome và WebKit với viewport iPhone; chưa kiểm tra trên iPhone vật lý. Tùy phiên bản iOS, Safari có thể mở xem trước: dùng Chia sẻ → Lưu vào Tệp, hoặc kiểm tra mục Tải về. Không dùng service worker hoặc endpoint export riêng.
 
